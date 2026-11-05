@@ -1,6 +1,6 @@
 # Collaborative Remote Browser (Go)
 
-A shared browser for two people, such as a receptionist and a kiosk. The page runs in one Chromium on the server. Your app starts a session through the API and gets two **seats**, host and guest. Each person's page puts the live view into a `<div>` with the JavaScript SDK. Both see the same page and can click, type, scroll, use dropdowns and answer dialogs, and each sees the other's cursor. Neither device loads the target page itself.
+A shared browser for two people. The page runs in one Chromium on the server. Your app starts a session through the API and gets two **seats**, host and guest. Each person's page puts the live view into a `<div>` with the JavaScript SDK. Both see the same page and can click, type, scroll, use dropdowns and answer dialogs, and each sees the other's cursor. Neither device loads the target page itself.
 
 ```
  Host's page (your app)          Collab server                  Guest's page (your app)
@@ -27,7 +27,7 @@ A shared browser for two people, such as a receptionist and a kiosk. The page ru
 ```bash
 curl -X POST https://collab.example.com/api/browser-sessions \
   -H "Authorization: Bearer $API_TOKEN" -H "Content-Type: application/json" \
-  -d '{"url": "https://checkin.example.com/", "host": {"name": "Front desk"}, "guest": {"name": "Lobby kiosk"}}'
+  -d '{"url": "https://www.example.com/", "host": {"name": "Alice"}, "guest": {"name": "Bob"}}'
 ```
 
 ```json
@@ -35,8 +35,8 @@ curl -X POST https://collab.example.com/api/browser-sessions \
   "sessionId": "8b3f1111eebfd21290493955",
   "status": "starting",
   "viewport": { "width": 1280, "height": 720 },
-  "host":  { "sessionId": "8b3f…", "participantId": "529b…", "token": "…", "role": "host",  "name": "Front desk" },
-  "guest": { "sessionId": "8b3f…", "participantId": "6c06…", "token": "…", "role": "guest", "name": "Lobby kiosk" }
+  "host":  { "sessionId": "8b3f…", "participantId": "529b…", "token": "…", "role": "host",  "name": "Alice" },
+  "guest": { "sessionId": "8b3f…", "participantId": "6c06…", "token": "…", "role": "guest", "name": "Bob" }
 }
 ```
 
@@ -44,7 +44,7 @@ Call this from your server, never from a browser, because it uses your API token
 
 ### 2. Your backend hands out the seats
 
-Give `host` to the host's page and `guest` to the guest's device, through whatever channel your app already uses (an API response, a push to the kiosk, and so on). A seat works like a password for that seat: send it only to that person, over HTTPS. Each session has exactly these two seats; nobody else can join.
+Give `host` to the host's page and `guest` to the guest's device, through whatever channel your app already uses (an API response, a push message, and so on). A seat works like a password for that seat: send it only to that person, over HTTPS. Each session has exactly these two seats; nobody else can join.
 
 ### 3. Each page mounts its view
 
@@ -59,7 +59,7 @@ Give `host` to the host's page and `guest` to the guest's device, through whatev
 
 `sdk.js` is a single file with no dependencies. Load it from the collab server so it always matches the server's version. The view fills the element you give it: size that element, and the picture keeps its aspect ratio and letterboxes. The view lives in its own shadow root, so your page's CSS can't break it, and several views can share a page.
 
-**Server settings for embedding:** add your app's origin(s) to `ALLOWED_ORIGINS` (e.g. `https://app.example.com,https://kiosk.example.com`); the WebSocket refuses other sites. If your pages have a Content-Security-Policy, allow `script-src https://collab.example.com` and `connect-src wss://collab.example.com`. Nothing else is needed: the SDK makes no HTTP requests and injects no inline styles or scripts.
+**Server settings for embedding:** add your app's origin(s) to `ALLOWED_ORIGINS` (e.g. `https://app.example.com,https://portal.example.com`); the WebSocket refuses other sites. If your pages have a Content-Security-Policy, allow `script-src https://collab.example.com` and `connect-src wss://collab.example.com`. Nothing else is needed: the SDK makes no HTTP requests and injects no inline styles or scripts.
 
 ### SDK reference
 
@@ -98,17 +98,17 @@ Give `host` to the host's page and `guest` to the guest's device, through whatev
 
 A view reconnects on its own after network drops. If the page reloads, mount again with the same seat.
 
-### Touch kiosks
+### Touch screens
 
 On touch, the on-screen keyboard opens only when someone taps a text field in the shared page, and with the layout the field asks for: a number pad for `type="tel"` or `inputmode="numeric"`, an `@` key for email, and so on. Tapping anywhere else closes it, and so does focus leaving the field (for example when the host clicks a button). The shared page reports where its text fields are, so the decision happens during the tap itself, which iOS requires. With a mouse, the view always takes keyboard input, as on a desktop.
 
 ### Locking the browser to your pages
 
-Set `ALLOWED_URL_PREFIXES` to the pages the shared browser may show, for example `https://checkin.example.com/,https://visitors.example.com/`. Then:
+Set `ALLOWED_URL_PREFIXES` to the pages the shared browser may show, for example `https://www.example.com/,https://help.example.com/`. Then:
 - sessions can only start on those URLs;
 - page navigation anywhere else is stopped before anything loads, and the page stays where it was. That covers links, redirects at every hop, scripts, the address bar and popups.
 
-Images, scripts and API calls from other domains still load. If a page sends people through a login provider, add its prefix too. Each prefix matches on path-segment boundaries: `https://x.com/kiosk` allows `/kiosk/...` but not `/kiosk-admin`.
+Images, scripts and API calls from other domains still load. If a page sends people through a login provider, add its prefix too. Each prefix matches on path-segment boundaries: `https://x.com/forms` allows `/forms/...` but not `/forms-admin`.
 
 ## Run it
 
@@ -154,7 +154,7 @@ The end-to-end suite starts the server (locked to the test site) and a test site
 - both see the same page; clicks from either window land on the same element and show in **both** decoded video streams;
 - clicks landing on the exact page pixel;
 - typing, special keys and the keyboard lease;
-- the kiosk keyboard: a tap on a text field opens it (phone keypad for a phone field), and it closes when the tap misses or focus leaves the field;
+- the on-screen keyboard on touch screens: a tap on a text field opens it (phone keypad for a phone field), and it closes when the tap misses or focus leaves the field;
 - cursors, scrolling, dropdowns, dialogs, address bar, back/forward and links;
 - the URL lock: links, redirects, popups and the address bar can't leave the allowed site;
 - turning WebRTC off and on (WebSocket video, with its latency and idle bandwidth), and a viewer whose WebRTC can't connect staying on WebSocket video;
@@ -173,7 +173,7 @@ Measured median click→pixel-change latency on loopback: **~180–220 ms** over
 | `ALLOWED_ORIGINS` | – | Sites (besides this server) whose pages may connect, i.e. your apps that embed the SDK. Comma list, e.g. `https://app.example.com`. |
 | `ALLOWED_URL_PREFIXES` | – (any public page) | Pages the shared browser may show. Comma list of URL prefixes (see *Locking the browser*). |
 | `CHROME_PATH` | auto | |
-| `CHROME_NO_SANDBOX` | `false` | Needed as root in containers without user namespaces |
+| `CHROME_NO_SANDBOX` | `false` | `true` turns Chromium's sandbox off. Development only (e.g. running as root). |
 | `VIEWPORT_WIDTH` / `VIEWPORT_HEIGHT` | `1280` / `720` | Shared viewport, fixed for the session (must be even) |
 | `FPS` / `BITRATE_KBPS` / `KEYFRAME_INTERVAL` | `25` / `2500` / `1s` | Also caps WebSocket video at `FPS` |
 | `JPEG_QUALITY` | `80` | Screencast frame quality |
@@ -248,7 +248,7 @@ Nobody requests control. Outside those windows, clicks and scrolls from both int
 - **Video is screencast-based.** Chromium only emits frames when the page repaints. The server repeats the last frame to keep a steady stream, but fast animation tops out around Chromium's screencast rate (~30 fps), and each frame is JPEG-encoded and then decoded before H.264 encoding. If that becomes the bottleneck, switch to capturing a virtual display (Xvfb + GStreamer `ximagesrc`). Only the capture step changes.
 - **Native UI isn't in the screencast.** `<select>` popups and `alert`/`confirm`/`prompt`/`beforeunload` are handled through the overlay. File pickers are blocked, with a notice. Other native UI isn't covered: autofill, permission prompts (auto-denied in headless mode), datalist and date-picker popups, and `<select>` inside iframes.
 - **One tab.** `window.open` and `target=_blank` load in the shared tab. A popup to an off-list URL is closed and never shown, but it can start loading in the background before it's closed.
-- **Touch keyboard edge cases.** Text fields inside iframes, and inside web components' shadow roots, aren't in the field map. Tapping them still focuses them in the page, but the on-screen keyboard only opens if the device allows a keyboard shortly after a tap (Android and Windows usually do; iOS doesn't). The keyboard can cover the lower part of the view; the page doesn't know about it. Test backspace and autocorrect on your actual kiosk device and keyboard app.
+- **Touch keyboard edge cases.** Text fields inside iframes, and inside web components' shadow roots, aren't in the field map. Tapping them still focuses them in the page, but the on-screen keyboard only opens if the device allows a keyboard shortly after a tap (Android and Windows usually do; iOS doesn't). The keyboard can cover the lower part of the view; the page doesn't know about it. Test backspace and autocorrect on your actual touch devices and keyboard apps.
 - **No audio, no clipboard sync out of the page, no file upload/download.** Paste into the page works.
 - **WebRTC waits for a keyframe.** A new WebRTC stream can take up to `KEYFRAME_INTERVAL` (1 s) to show a picture; WebSocket video covers the gap.
 - **WebSocket video bandwidth.** An idle page costs nothing; WebRTC sends ~180 kbps of repeated frames. A page that keeps changing costs one full JPEG per repaint, for example ~63 KB for example.com at 1280×720, quality 80. At the 25 fps cap that's roughly 12 Mbps per viewer while it lasts, against WebRTC's ≤ 3 Mbps. Slow connections get fewer frames, not a growing delay. Networks that block WebSockets break the whole app, not just video.
@@ -261,7 +261,7 @@ Nobody requests control. Outside those windows, clicks and scrolls from both int
 - Run each session (or each node) in a container with CPU and memory limits, and a NetworkPolicy that allows egress **only** through the proxy, as defense in depth beyond the in-process proxy.
 - Networks that block UDP already work, through WebSocket video. For WebRTC quality on those networks too, run a TURN server (coturn) with TLS on port 443 and pass it in `ICE_SERVERS`.
 - Serve over HTTPS/WSS (the `https` compose profile does this).
-- Pin and patch Chromium; it renders untrusted content. Keep the Chromium sandbox on (don't set `CHROME_NO_SANDBOX`) when the container allows it.
+- Pin and patch Chromium (rebuild the image regularly: `docker compose build --pull`); it renders untrusted content. Chromium's sandbox is on in the Docker setup, through [deploy/chromium-seccomp.json](deploy/chromium-seccomp.json); keep it on.
 - To scale horizontally: sessions live in-process, so route `/api/browser-sessions/{id}/*` to the node that owns the session (sticky routing by session ID).
 
 ## Layout
