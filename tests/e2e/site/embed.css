@@ -1,0 +1,10 @@
+body { margin: 20px; font: 18px serif; background: #ddd; }
+.views { display: flex; gap: 20px; }
+.slot { width: 640px; height: 360px; }
+
+/* Hostile on purpose: rules like these are common on real sites, and none
+   may break the embedded views. The first set can only reach elements in
+   the page itself; the second targets the view's own host element. */
+video, canvas, textarea { filter: invert(1) !important; width: 10px !important; height: 10px !important; display: none !important; }
+.slot > * { display: inline !important; width: 50px !important; height: 20px !important; padding: 30px !important; filter: invert(1) !important; }
+* { cursor: wait !important; font-family: serif !important; }

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Shared Browser</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="landing" class="card-page" hidden>
+    <form id="createForm" class="card">
+      <h1>Shared browser</h1>
+      <p class="muted">A demo of the API and SDK. It starts a session with two seats: you (the host) and a guest. Send the guest link to the other person.</p>
+      <label for="createUrl">Start page</label>
+      <input id="createUrl" type="text" inputmode="url" autocomplete="url" list="allowedUrls" placeholder="https://example.com" required>
+      <datalist id="allowedUrls"></datalist>
+      <div id="apiTokenRow" hidden>
+        <label for="apiToken">API token</label>
+        <input id="apiToken" type="password" autocomplete="off">
+      </div>
+      <label for="hostName">Your name</label>
+      <input id="hostName" type="text" maxlength="40" autocomplete="nickname" placeholder="Host">
+      <label for="guestName">Guest's name</label>
+      <input id="guestName" type="text" maxlength="40" placeholder="Guest">
+      <button type="submit" class="primary">Start session</button>
+      <p id="createError" class="error" role="alert"></p>
+    </form>
+  </main>
+
+  <main id="message" class="card-page" hidden>
+    <div class="card">
+      <h1>Shared browser</h1>
+      <p id="messageText" class="muted"></p>
+    </div>
+  </main>
+
+  <div id="app" hidden>
+    <header class="toolbar">
+      <div class="nav-buttons">
+        <button id="btnBack" type="button" title="Back" aria-label="Back">&#8592;</button>
+        <button id="btnForward" type="button" title="Forward" aria-label="Forward">&#8594;</button>
+        <button id="btnReload" type="button" title="Reload" aria-label="Reload">&#8635;</button>
+      </div>
+      <form id="urlForm" class="url-form">
+        <span id="loadingDot" class="loading-dot" aria-hidden="true"></span>
+        <input id="urlInput" type="text" inputmode="url" spellcheck="false" autocomplete="off" aria-label="Address">
+      </form>
+      <div id="participants" class="participants" aria-label="Participants"></div>
+      <div class="video-ctl">
+        <span id="videoStats" class="video-stats"></span>
+        <button id="btnVideo" type="button" aria-pressed="true">WebRTC: on</button>
+      </div>
+      <button id="btnGuestLink" type="button" hidden>Copy guest link</button>
+      <button id="btnEnd" type="button" class="danger" hidden>End session</button>
+    </header>
+    <div id="viewSlot" class="view-slot"></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+  </div>
+  <script src="sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

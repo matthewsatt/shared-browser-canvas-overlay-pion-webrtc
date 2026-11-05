@@ -1,0 +1,13 @@
+# Only the Go sources and web/ go into the image build.
+# Never send secrets (.env) or anything else to the Docker daemon.
+.env
+.env.*
+.git
+.claude
+bin/
+tests/
+examples/
+deploy/
+*.md
+docker-compose*.yml
+Caddyfile

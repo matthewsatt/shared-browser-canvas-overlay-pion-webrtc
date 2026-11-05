@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>precision</title>
+  <style>html, body { margin: 0; overflow: hidden; background: #fff; } canvas { display: block; }</style>
+</head>
+<body>
+  <canvas id="c" width="1280" height="720"></canvas>
+  <script>
+    // Red 11x11 squares centred on known viewport points: square (x, y)
+    // covers [x-5, x+6), so its centre is (x+0.5, y+0.5) in CSS px.
+    // Each pointerdown reports where it landed.
+    const points = [[40, 40], [640, 360], [1239, 679], [200, 600], [1100, 120]];
+    const g = document.getElementById('c').getContext('2d');
+    g.fillStyle = '#f00';
+    for (const [x, y] of points) g.fillRect(x - 5, y - 5, 11, 11);
+    addEventListener('pointerdown', (e) => fetch('/report', {
+      method: 'POST', body: JSON.stringify({ page: 'precision', x: e.clientX, y: e.clientY, n: Date.now() }),
+    }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Page Two</title></head>
+<body style="margin:0;background:rgb(0,0,220);color:#fff;font:32px sans-serif">
+  <p style="padding:40px">Page two</p>
+  <script>
+    fetch('/report', { method: 'POST', body: JSON.stringify({ page: 'page2', cookie: document.cookie, host: location.host }) });
+  </script>
+</body>
+</html>

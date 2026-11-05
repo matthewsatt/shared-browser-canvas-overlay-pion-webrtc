@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lock</title>
+  <style>
+    body { margin: 0; font: 24px sans-serif; background: #fff; }
+    a { position: absolute; left: 100px; width: 500px; height: 50px; line-height: 50px; padding-left: 10px; background: #eef; }
+    #off { top: 100px; } #redir { top: 200px; } #popup { top: 300px; } #ok { top: 400px; }
+  </style>
+</head>
+<body>
+  <!-- localhost is reachable but not on the allowed list (127.0.0.1 is). -->
+  <a id="off" href="http://localhost:8765/page2.html">Off-list link</a>
+  <a id="redir" href="/redirect?to=http://localhost:8765/page2.html">Allowed URL that redirects off-list</a>
+  <a id="popup" href="http://localhost:8765/page2.html" target="_blank">Off-list popup</a>
+  <a id="ok" href="page2.html">Allowed link</a>
+  <script>
+    fetch('/report', { method: 'POST', body: JSON.stringify({ page: 'lock' }) }).catch(() => {});
+  </script>
+</body>
+</html>

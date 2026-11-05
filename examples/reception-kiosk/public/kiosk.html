@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Kiosk</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- The only collab code your app needs: the SDK, loaded from the collab server. -->
+  <script src="__COLLAB_SERVER__/sdk.js"></script>
+</head>
+<body class="kiosk">
+  <div id="idle" class="idle">
+    <h1>Welcome</h1>
+    <p>A receptionist will be with you in a moment.</p>
+  </div>
+  <!-- The shared browser appears in here, full screen. -->
+  <div id="screen" class="screen" hidden></div>
+  <script src="kiosk.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- A partner site with a strict CSP: scripts only from itself and the collab server, no inline styles. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' http://127.0.0.1:8080; connect-src 'self' ws://127.0.0.1:8080; style-src 'self'; img-src 'self'">
+  <title>Partner site</title>
+  <link rel="stylesheet" href="embed.css">
+</head>
+<body>
+  <h1>Partner site</h1>
+  <div class="views">
+    <div id="host" class="slot"></div>
+    <div id="guest" class="slot"></div>
+  </div>
+  <script src="embed.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# HTTPS front end for a public deployment (docker compose --profile https).
+# DOMAIN must have a DNS A record pointing at this server. Caddy gets and
+# renews a Let's Encrypt certificate for it, redirects HTTP to HTTPS and
+# passes WebSocket upgrades through. It keeps the original Host header, so
+# the server's WebSocket Origin check works without ALLOWED_ORIGINS.
+#
+# WebRTC video doesn't go through Caddy: viewers connect to the UDP port
+# range on collab-browser directly (it's encrypted end to end with DTLS-SRTP).
+
+{$DOMAIN} {
+	header {
+		# Browsers only ever use HTTPS for this host from now on.
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+	reverse_proxy collab-browser:8080
+}

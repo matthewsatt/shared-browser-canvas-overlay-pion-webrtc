@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reception desk</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- The only collab code your app needs: the SDK, loaded from the collab server. -->
+  <script src="__COLLAB_SERVER__/sdk.js"></script>
+</head>
+<body class="desk">
+  <header>
+    <h1>Reception desk</h1>
+    <form id="startForm">
+      <label>Kiosk <input id="kioskId" value="lobby-1" size="10"></label>
+      <label>Page <select id="startPage"></select></label>
+      <button type="submit">Start session</button>
+    </form>
+    <div id="controls" hidden>
+      <button id="btnBack" type="button">Back</button>
+      <button id="btnReload" type="button">Reload</button>
+      <span id="status"></span>
+      <button id="btnEnd" type="button" class="danger">End session</button>
+    </div>
+  </header>
+  <p id="error" class="error"></p>
+  <!-- The shared browser appears in here. -->
+  <div id="screen" class="screen"></div>
+  <script src="receptionist.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>color</title>
+  <style>html, body { margin: 0; height: 100%; }</style>
+</head>
+<body>
+  <script>
+    // Fills the page with ?c=<hex>, so each session's picture is unmistakable.
+    document.body.style.background = '#' + (new URLSearchParams(location.search).get('c') || '888888');
+    fetch('/report', { method: 'POST', body: JSON.stringify({ page: 'color', tag: location.search }) }).catch(() => {});
+  </script>
+</body>
+</html>

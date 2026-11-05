@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test Page</title>
+  <style>
+    body { margin: 0; font: 20px sans-serif; background: #fff; }
+    .abs { position: absolute; }
+    #btn { left: 100px; top: 100px; width: 200px; height: 60px; font-size: 20px; }
+    #alertBtn { left: 400px; top: 100px; width: 200px; height: 60px; font-size: 20px; }
+    #count { left: 100px; top: 180px; }
+    #name { left: 100px; top: 260px; width: 600px; height: 60px; font-size: 36px; }
+    #phone { left: 750px; top: 260px; width: 300px; height: 60px; font-size: 36px; }
+    #sel { left: 100px; top: 360px; width: 220px; height: 40px; font-size: 18px; }
+    #link { left: 100px; top: 440px; font-size: 24px; }
+    #spacer { height: 4000px; }
+  </style>
+</head>
+<body>
+  <button id="btn" class="abs">Click me</button>
+  <button id="alertBtn" class="abs">Alert</button>
+  <div id="count" class="abs">0</div>
+  <input id="name" class="abs" placeholder="type here">
+  <input id="phone" class="abs" type="tel" placeholder="phone">
+  <select id="sel" class="abs">
+    <option>Red</option><option>Green</option><option>Blue</option><option>Yellow</option>
+  </select>
+  <a id="link" class="abs" href="page2.html">Go to page 2</a>
+  <div id="spacer"></div>
+  <script>
+    if (location.search.includes('set=1')) {
+      document.cookie = 'k=session-one; path=/';
+      localStorage.setItem('k', 'session-one');
+    }
+    let count = 0;
+    // ?tag=x keeps reports from a second session apart from the main one.
+    const tag = new URLSearchParams(location.search).get('tag');
+    const report = () => fetch('/report', { method: 'POST', body: JSON.stringify({
+      page: 'index', tag, count, name: document.getElementById('name').value,
+      sel: document.getElementById('sel').value, scrollY: Math.round(window.scrollY),
+      cookie: document.cookie, ls: localStorage.getItem('k'), dialog: window.__dialogResult ?? null,
+      lastKey: window.__lastKey || null,
+    }) }).catch(() => {});
+    document.getElementById('btn').addEventListener('click', () => {
+      count++;
+      document.getElementById('count').textContent = String(count);
+      document.body.style.background = count % 2 ? 'rgb(0,200,0)' : '#fff';
+      report();
+    });
+    document.getElementById('alertBtn').addEventListener('click', () => {
+      window.__dialogResult = confirm('Proceed?');
+      report();
+    });
+    document.getElementById('name').addEventListener('input', report);
+    document.getElementById('name').addEventListener('keydown', (e) => { window.__lastKey = e.key; });
+    document.getElementById('sel').addEventListener('change', report);
+    let t = null;
+    window.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(report, 100); });
+    window.addEventListener('load', report);
+  </script>
+</body>
+</html>

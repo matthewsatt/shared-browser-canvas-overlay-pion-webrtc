@@ -1,0 +1,11 @@
+{
+  "name": "reception-kiosk-example",
+  "private": true,
+  "description": "Example app: a receptionist and a kiosk sharing a browser through the collab server",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
